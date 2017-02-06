@@ -1,0 +1,4 @@
+DATADIR = ""
+MIN_TIME = 0.0
+MAX_TIME = 0.6
+WIDTH = 20
