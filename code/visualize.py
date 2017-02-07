@@ -5,23 +5,6 @@ import matplotlib.mlab as mlab
 import numpy as np
 
 
-def plot_gaussian_contour(xlim, ylim, mu, sig, delta=0.025, n=5, cmap=None):
-    x = np.arange(xlim[0], xlim[1], delta)
-    y = np.arange(ylim[0], ylim[1], delta)
-    X, Y = np.meshgrid(x, y)
-
-    Z = mlab.bivariate_normal(
-        X,
-        Y,
-        np.sqrt(sig[0,0]),
-        np.sqrt(sig[1,1]),
-        mu[0],
-        mu[1],
-        sig[0,1])
-
-    return plt.contour(X, Y, Z, n, cmap=cmap)
-
-
 def plotting_tools(table):
     stim_to_stim_type = sorted(set(zip(table["stim"], table["stim_type"])))
     stim_types = np.array([_[1] for _ in stim_to_stim_type])

@@ -42,30 +42,6 @@ class CachedTemplate(object):
         return row_templates
 
 
-class CachedGaussianTemplate(CachedTemplate):
-
-    def summarize(self, x_arr):
-        return np.mean(x_arr, axis=0), np.cov(x_arr.T)
-
-    def _likelihood(self, x, template):
-        mu, cov = template
-        dmu = x - mu
-
-        inv = np.linalg.pinv(cov)
-        det = 1.0 / np.linalg.det(inv)
-        return (
-                np.exp(-0.5 * np.dot(np.dot(dmu.T, inv), dmu)) /
-                np.sqrt(2.0 * np.pi * det)
-                )
-
-    def distances(self, x, y_arr):
-        distances = []
-        for y in y_arr:
-            distances.append(self._likelihood(x, y))
-        total = 1.0 # np.sum(distances)
-        return [likelihood / total for likelihood in distances]
-
-
 def template_selectors(table, key="stim"):
     """Return array filters that will select the pool of datapoints
     from which to build templates
@@ -117,11 +93,8 @@ def compute_distances_to_all_templates(x_arr, template_selectors, TemplateClass,
 
 
 def compute_euclidian_distances_to_all_templates(x_arr, template_selectors, verbose=False):
+    # TODO can refactor this now maybe to stop having to pass CachedTemplate class
     return compute_distances_to_all_templates(x_arr, template_selectors, CachedTemplate, verbose=verbose)
-
-
-def compute_likelihood_to_all_templates(x_arr, template_selectors, verbose=False):
-    return compute_distances_to_all_templates(x_arr, template_selectors, CachedGaussianTemplate, verbose=verbose)
 
 
 def compute_nearest_template_with_ties(distance_arr, stims):
@@ -129,12 +102,4 @@ def compute_nearest_template_with_ties(distance_arr, stims):
     for distances in distance_arr:
         nearest_stims.append(np.where(distances == np.min(distances))[0])
     return nearest_stims
-
-
-def compute_nearest_template(distance_arr, stims):
-    nearest_stims = []
-    for distances in distance_arr:
-        nearest_stims.append(stims[np.argmin(distances)])
-    return np.array(nearest_stims)
-
 
